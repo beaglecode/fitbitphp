@@ -15,6 +15,11 @@ class EndpointGateway {
     protected $responseFormat;
 
     /**
+     * @var ResponseParserInterface
+     */
+    protected $responseParser;
+
+    /**
      * @var string
      */
     protected $userID;
@@ -42,6 +47,19 @@ class EndpointGateway {
     public function setResponseFormat($format)
     {
         $this->responseFormat = $format;
+        return $this;
+    }
+
+    /**
+     * Set Fitbit responseParser
+     *
+     * @access public
+     * @param FormatterInterface
+     * @return \Fitbit\EndpointGateway
+     */
+    public function setResponseParser($parser)
+    {
+        $this->responseParser = $parser;
         return $this;
     }
 
@@ -90,7 +108,9 @@ class EndpointGateway {
      */
     private function parseResponse($response)
     {
-        if ($this->responseFormat == 'json') {
+        if ($this->responseParser){
+            return $this->responseParser->parse($response);
+        } elseif ($this->responseFormat == 'json') {
             return json_decode($response);
         } elseif ($this->responseFormat == 'xml') {
             return simplexml_load_string($response);
